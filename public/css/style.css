@@ -1,0 +1,44 @@
+*{
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+:root {
+
+  --color1: #00295b;    
+  --color2: #46479d;   
+  --color3: #00b7ff;      
+  --color4: #00fbd1;         
+  --color5: #ffffa8;   
+
+  --text1: #f3f4f6;
+  --text2: #111827;
+
+
+}
+
+
+footer{
+    position: absolute;
+    bottom: 0;
+    width: 100vw;
+    height: 40px;
+    background-color: var(--color1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--text1);
+    gap: 4px;
+    text-align: center;
+
+}
+footer a {
+  display: flex;
+  align-items: center;
+}
+
+
+#github-icon{
+    width: 24px;
+    height: 24px;
+}
