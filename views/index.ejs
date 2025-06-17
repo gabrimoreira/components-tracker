@@ -2,13 +2,25 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title><%= title %></title>
-    <link rel="stylesheet" href="/css/main.css" />
+    <title>Home</title>
     <%- include('partials/head') %>
   </head>
-  <body class="poppins-regular">
-    <h1>Olá, <%= name %>!</h1>
-    <p>Bem-vindo ao servidor com Express + EJS.</p>
+  <body class="poppins-regular bg-base">
+    <%- include('partials/navbar') %>
+
+    <main class="container">
+      <h1 class="title">Conheça o Componentes Tracker</h1>
+      <p class="text">
+        Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores ipsum
+        ea cumque eum eveniet itaque temporibus aperiam qui, magni soluta
+        accusamus quod ut voluptates reprehenderit quas. Quaerat accusamus
+        labore voluptates.
+      </p>
+      <a href="/sign-up">
+        <button class="btn-header">Faça Parte</button>
+      </a>
+    </main>
+
     <%- include('partials/footer') %>
   </body>
 </html>

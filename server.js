@@ -8,10 +8,16 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.render('index', { title: 'Página Inicial', name: 'Gabriel' });
+  res.render('index');
+});
+app.get('/login', (req, res) => {
+  res.render('login');
+});
+app.get('/sign-up', (req, res) => {
+  res.render('sign-up');
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT =  3000;
 app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Rodando na Porta: http://localhost:${PORT}`);
 });
