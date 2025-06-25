@@ -14,9 +14,6 @@ html {
 }
 
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100vw;
   height: 40px;
   background-color: var(--color1);
   display: flex;
@@ -26,6 +23,7 @@ html {
   gap: 8px;
   text-align: center;
 }
+
 .footer a {
   display: flex;
   align-items: center;
@@ -80,7 +78,7 @@ html {
 .container {
   display: flex;
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   flex-direction: column;
   justify-content: flex-start;
   margin-top: 30vh;
@@ -107,4 +105,73 @@ html {
 
   background-color: #111827;
   font-size: 1.25rem;
+}
+
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: var(--bg-default);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+}
+
+.form .form-element {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+}
+
+.form label {
+  font-weight: bold;
+  color: var(--color1);
+}
+
+.form .input {
+  padding: 10px;
+  border: 1px solid var(--color2);
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form .input:focus {
+  outline: none;
+  border-color: var(--color3);
+  box-shadow: 0 0 0 3px rgba(0, 183, 255, 0.3);
+}
+
+.form .btn {
+  padding: 12px;
+  background-color: var(--color2);
+  color: var(--text1);
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.form .btn:hover {
+  background-color: var(--color1);
+} 
+
+
+
+.container-signup {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-top: 10vh;
+  gap: 30px;
+  align-items: center;
+  text-align: center;
+  text-wrap: balance;
 }

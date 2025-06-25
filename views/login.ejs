@@ -8,9 +8,36 @@
   <body class="poppins-regular bg-base">
     <%- include('partials/navbar') %>
 
-    <main class="container">
+    <main class="container-signup">
       <h1 class="title">Login</h1>
-      <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Maiores ipsum ea cumque eum eveniet itaque temporibus aperiam qui, magni soluta accusamus quod ut voluptates reprehenderit quas. Quaerat accusamus labore voluptates.</p>
+
+      <form action="/Login" method="POST" class="form mt-4">
+        <div class="form-element">
+          <label for="email">E-mail</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            class="input"
+            placeholder="seu@email.com"
+          />
+        </div>
+
+        <div class="form-element">
+          <label for="password">Senha</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            class="input"
+            placeholder="Senha"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Entrar</button>
+      </form>
     </main>
 
     <%- include('partials/footer') %>

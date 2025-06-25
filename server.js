@@ -17,6 +17,12 @@ app.get('/sign-up', (req, res) => {
   res.render('sign-up');
 });
 
+app.post('/sign-up', (req, res) => {
+  const user = { name: 'Gabriel' }; 
+  res.render('student/index', { user });
+});
+
+
 const PORT =  3000;
 app.listen(PORT, () => {
   console.log(`Rodando na Porta: http://localhost:${PORT}`);

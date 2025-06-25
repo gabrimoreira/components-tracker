@@ -1,5 +1,6 @@
 /*Aqui, importar os outros css*/
 @import url('style.css');
+@import url('student.css');
 
 * {
   padding: 0;
