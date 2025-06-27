@@ -12,6 +12,17 @@
 html {
   font-size: 16px;
 }
+.contrast-mode {
+  --bg-default: #000000;
+  --text1: #111827;
+
+  --text2: #f3f4f6;
+  --color1: #ffff00;
+  --color2: #ff00ff;
+  --color3: #00ffff;
+  --color4: #ff9900;
+  --color5: #ffffff;
+}
 
 .footer {
   height: 40px;
@@ -102,11 +113,9 @@ html {
 }
 
 .btn-header:hover {
-
   background-color: #111827;
   font-size: 1.25rem;
 }
-
 
 .form {
   display: flex;
@@ -159,9 +168,7 @@ html {
 
 .form .btn:hover {
   background-color: var(--color1);
-} 
-
-
+}
 
 .container-signup {
   display: flex;
