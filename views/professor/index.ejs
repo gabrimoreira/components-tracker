@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Home</title>
+    <%- include('partials/head') %>
+  </head>
+  <body class="poppins-regular bg-base">
+    <%- include('partials/navbar') %>
+
+    <main class="container">
+      <h1 class="title">Seja bem-vindo, <%= user.name %></h1>
+      <p class="text">
+        No Components Tracker, você pode ver e adicionar suas práticas,
+        verificar os componentes disponiveis em cada laboratório e criar novos
+        tipos de componentes
+      </p>
+      <a href="/student/componentes">
+        <button class="btn-header">Verifique os componentes disponíveis</button>
+      </a>
+
+      <a href="/student/praticas">
+        <button class="btn-header">Veja suas práticas</button>
+      </a>
+      <a href="/student/componentes">
+        <button class="btn-header">Adicionar novos componentes</button>
+      </a>
+      <a href="/student/componentes">
+        <button class="btn-header">Adicionar novas práticas</button>
+      </a>
+    </main>
+
+    <%- include('../partials/footer') %>
+  </body>
+</html>

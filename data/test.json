@@ -1,0 +1,14 @@
+[
+  {
+    "nome": "Protoboard",
+    "exigeId": true,
+    "ids": ["PB001", "PB002"],
+    "laboratorio": "Lab. de Eletrônica"
+  },
+  {
+    "nome": "LED",
+    "exigeId": false,
+    "quantidade": 150,
+    "laboratorio": "Lab. de Física"
+  }
+]
