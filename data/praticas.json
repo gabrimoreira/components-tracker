@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1001,
+    "titulo": "Circuitos Elétricos",
+    "descricao": "Aprender sobre resistores e capacitores.",
+    "componentes": ["resistor", "capacitor"],
+    "turmaId": 101
+  },
+  {
+    "id": 1002,
+    "titulo": "Arduino Básico",
+    "descricao": "Introdução ao Arduino com LEDs.",
+    "componentes": ["arduino", "led", "resistor"],
+    "turmaId": 101
+  }
+]

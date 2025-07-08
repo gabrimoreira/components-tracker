@@ -1,0 +1,41 @@
+[
+  {
+    "id": 1,
+    "name": "Alice",
+    "email": "alice@aluno.com",
+    "password": "123",
+    "profile": "student",
+    "school": "UFC",
+    "turmaId": 101
+  },
+  {
+    "id": 2,
+    "name": "Bruno",
+    "email": "bruno@tecnico.com",
+    "password": "123",
+    "profile": "tecnico",
+    "school": "UFC"
+  },
+  {
+    "id": 3,
+    "name": "Clara",
+    "email": "clara@professor.com",
+    "password": "123",
+    "profile": "professor",
+    "school": "UFC",
+    "turmasIds": [
+      101,
+      102
+    ]
+  },
+  {
+    "id": 1752001928849,
+    "name": "sdf",
+    "email": "gabriel@email.com",
+    "password": "123",
+    "profile": "student",
+    "school": "UFC",
+    "turmasIds": [],
+    "praticasIds": []
+  }
+]
