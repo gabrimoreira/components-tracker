@@ -1,16 +1,12 @@
 const fs = require("fs");
 const path = require("path");
 
-const filePath = path.join(__dirname, "../data/test.json");
-
 function readComponentes() {
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    return JSON.parse(data);
-  } catch (err) {
-    console.error("Erro ao ler o JSON:", err);
-    return [];
-  }
+  const componentes = fs.readFileSync(
+    path.join(__dirname, "../data", "componentes.json"),
+    "utf-8"
+  );
+  return JSON.parse(componentes);
 }
 
 function saveComponentes(componentes) {
@@ -26,7 +22,6 @@ function loadUsers() {
     "utf-8"
   );
   return JSON.parse(users);
-
 }
 
 function saveUsers(users) {
@@ -41,10 +36,9 @@ function saveUsers(users) {
   }
 }
 
-
 module.exports = {
   readComponentes,
   saveComponentes,
   loadUsers,
-  saveUsers
+  saveUsers,
 };

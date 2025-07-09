@@ -11,42 +11,24 @@
     <main class="container">
       <h1 class="title">Componentes</h1>
 
-      <form method="GET" action="/componentes" class="componentes-form">
+      <div class="componentes-form">
         <input
           type="text"
           name="search"
           placeholder="Buscar componente..."
-          value="<%= search || '' %>"
           class="componentes-search"
         />
-        <button type="submit" class="btn-header">Buscar</button>
-      </form>
+      </div>
 
-      <section class="componentes-grid">
-        <% if (componentes.length === 0) { %>
-          <p>Nenhum componente encontrado.</p>
-        <% } else { %>
-          <% componentes.forEach(comp => { %>
-            <div class="componentes-card">
-              <h2><%= comp.nome %></h2>
-              <p><strong>Laboratório:</strong> <%= comp.laboratorio %></p>
-
-              <% if (comp.exigeId) { %>
-                <p><strong>IDs:</strong></p>
-                <ul>
-                  <% comp.ids.forEach(id => { %>
-                    <li><%= id %></li>
-                  <% }) %>
-                </ul>
-              <% } else { %>
-                <p><strong>Quantidade:</strong> <%= comp.quantidade %></p>
-              <% } %>
-            </div>
-          <% }) %>
-        <% } %>
+      <section class="componentes-grid" id="componentes-container">
       </section>
     </main>
 
     <%- include('../partials/footer') %>
+
+    <script src="/js/student.js"></script>
+    <script>
+      carregarComponentes();
+    </script>
   </body>
 </html>

@@ -3,14 +3,21 @@
     "id": 1001,
     "titulo": "Circuitos Elétricos",
     "descricao": "Aprender sobre resistores e capacitores.",
-    "componentes": ["resistor", "capacitor"],
-    "turmaId": 101
+    "turmaId": 101,
+    "componentes": [
+      { "nome": "Resistor 220Ω", "quantidade": 10 },
+      { "nome": "Protoboard", "ids": ["PB001", "PB002"] }
+    ]
   },
-  {
-    "id": 1002,
-    "titulo": "Arduino Básico",
-    "descricao": "Introdução ao Arduino com LEDs.",
-    "componentes": ["arduino", "led", "resistor"],
-    "turmaId": 101
+    {
+    "id": 1001,
+    "titulo": "Circuitos Elétricos",
+    "descricao": "Aprender sobre resistores e capacitores.",
+    "turmaId": 101,
+    "componentes": [
+      { "nome": "Resistor 220Ω", "quantidade": 10 },
+      { "nome": "Protoboard", "ids": ["PB001", "PB002"] }
+    ]
   }
 ]
+

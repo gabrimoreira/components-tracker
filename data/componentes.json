@@ -1,0 +1,40 @@
+[
+  {
+    "nome": "LED",
+    "tipo": "consumo",
+    "descricao": "texto de descricao",
+    "laboratorio": "Lab 1",
+    "quantidade": "100",
+
+    "exigeId": false
+  },
+  {
+    "nome": "Resistor 220Ω",
+    "tipo": "consumo",
+    "descricao": "texto de descricao",
+    "laboratorio": "Lab 1",
+
+    "quantidade": "100",
+
+    "exigeId": false
+  },
+  {
+    "nome": "Protoboard",
+    "tipo": "patrimônio",
+    "descricao": "texto de descricao",
+    "laboratorio": "Lab 1",
+
+    "ids": [1, 2, 3],
+    "exigeId": true
+  },
+  {
+    "nome": "HC-05",
+    "tipo": "patrimônio",
+    "descricao": "texto de descricao",
+    "laboratorio": "Lab 1",
+
+    "ids": [1, 2, 3],
+
+    "exigeId": true
+  }
+]

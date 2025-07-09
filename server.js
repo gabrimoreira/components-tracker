@@ -3,7 +3,8 @@ const path = require("path");
 const {
   readComponentes,
   saveComponentes,
-  loadUsers,saveUsers
+  loadUsers,
+  saveUsers,
 } = require("./utils/jsonUtils");
 const componentesBase = require("./data/componentesBase");
 const fs = require("fs");
@@ -13,7 +14,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/sign-up", (req, res) => {
   const users = loadUsers();
-  const { name, accountType, school, email, password, confirmPassword } = req.body;
+  const { name, accountType, school, email, password, confirmPassword } =
+    req.body;
 
   if (password !== confirmPassword) {
     return res.status(400).send("As senhas não coincidem.");
@@ -35,12 +37,12 @@ app.post("/sign-up", (req, res) => {
   }
 
   const newUser = {
-    id: Date.now(), 
+    id: Date.now(),
     name,
     email,
-    password, 
+    password,
     profile,
-    school
+    school,
   };
 
   if (profile === "student" || profile === "professor") {
@@ -51,7 +53,6 @@ app.post("/sign-up", (req, res) => {
   users.push(newUser);
   saveUsers(users);
 
-
   if (profile === "student") {
     res.render("student/index", { user: newUser });
   } else if (profile === "professor") {
@@ -60,7 +61,6 @@ app.post("/sign-up", (req, res) => {
     res.render("tecnico/index", { user: newUser });
   }
 });
-
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -137,23 +137,28 @@ app.get("/student/praticas", (req, res) => {
 });
 
 app.get("/student/componentes", (req, res) => {
-  const search = req.query.search?.toLowerCase() || "";
-  const componentes = readComponentes();
+  res.render("student/componentes"); 
+});
 
-  const resultado = componentes.filter((c) =>
-    c.nome.toLowerCase().includes(search)
-  );
 
-  res.render("student/componentes", { componentes: resultado, search });
+
+app.get("/api/componentes", (req, res) => {
+  const filePath = path.join(__dirname, "data/componentes.json");
+
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const componentes = JSON.parse(data);
+    res.json(componentes);
+  } catch (err) {
+    console.error("Erro ao ler componentes.json:", err);
+    res.status(500).json({ error: "Erro ao carregar componentes" });
+  }
 });
 
 app.get("/tecnico", (req, res) => {
   const user = { name: "Gabriel" };
   res.render("tecnico/index", { user });
 });
-
-
-
 
 app.get("/tecnico", (req, res) => {
   const user = { name: "Gabriel" };
