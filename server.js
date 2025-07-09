@@ -97,8 +97,11 @@ app.get("/sign-up", (req, res) => {
   res.render("sign-up");
 });
 app.get("/professor", (req, res) => {
-  const user = { name: "Gabriel" };
-  res.render("professor/index", { user });
+  if (!userTest || userTest.profile !== "professor") {
+    return res.status(403).send("Acesso negado.");
+  }
+
+  res.render("professor/index", { user: userTest });
 });
 
 app.get("/student", (req, res) => {
@@ -250,52 +253,139 @@ app.get("/api/componentes", (req, res) => {
 
 
 app.get("/tecnico", (req, res) => {
-  const user = { name: "Gabriel" };
-  res.render("tecnico/index", { user });
+  if (!userTest || userTest.profile !== "tecnico") {
+    return res.status(403).send("Acesso negado.");
+  }
+
+  res.render("tecnico/index", { user: userTest });
 });
 
-app.get("/tecnico", (req, res) => {
-  const user = { name: "Gabriel" };
-  res.render("tecnico/index", { user });
+app.get("/tecnico/componentes", (req, res) => {
+  res.render("tecnico/componentes");
+});
+
+app.get("/api/componentes", (req, res) => {
+  const filePath = path.join(__dirname, "data/componentes.json");
+
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const componentes = JSON.parse(data);
+    res.json(componentes);
+  } catch (err) {
+    console.error("Erro ao ler componentes.json:", err);
+    res.status(500).json({ error: "Erro ao carregar componentes" });
+  }
 });
 
 app.get("/tecnico/add-componentes", (req, res) => {
-  const user = { name: "Gabriel" };
-  res.render("tecnico/add-componentes", { user, componentesBase });
+  res.render("tecnico/add-componentes"); 
 });
+
 
 app.post("/add-componentes", (req, res) => {
-  const { nome, laboratorio, categoria } = req.body;
-  const hasId = req.body.hasId === "on";
+  const { nome, hasId, quantidade, ids, laboratorio, categoria } = req.body;
 
-  if (hasId) {
-    const ids = req.body.ids
+  const exigeId = hasId === "on"; 
+
+  const novoComponente = {
+    nome,
+    laboratorio,
+    tipo: categoria,
+    descricao: "Sem descrição ainda",
+    exigeId
+  };
+
+  if (exigeId) {
+    const idsArray = ids
       .split("\n")
-      .map((id) => id.trim())
-      .filter((id) => id.length > 0);
+      .map(id => id.trim())
+      .filter(id => id !== "");
 
-    ids.forEach((id) => {
-      componentes.push({
-        nome,
-        laboratorio,
-        categoria,
-        idUnico: id,
-        comId: true,
-      });
-    });
+    novoComponente.ids = idsArray;
   } else {
-    const quantidade = parseInt(req.body.quantidade);
-    componentes.push({
-      nome,
-      laboratorio,
-      categoria,
-      quantidade,
-      comId: false,
-    });
+    novoComponente.quantidade = parseInt(quantidade, 10) || 0;
   }
 
-  res.redirect("/student/componentes");
+  const filePath = path.join(__dirname, "data", "componentes.json");
+  const componentes = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+  componentes.push(novoComponente);
+
+  fs.writeFileSync(filePath, JSON.stringify(componentes, null, 2), "utf8");
+
+  res.redirect("/tecnico/componentes");
 });
+
+
+
+app.get("/professor/componentes", (req, res) => {
+  res.render("professor/componentes");
+});
+
+app.get("/api/componentes", (req, res) => {
+  const filePath = path.join(__dirname, "data/componentes.json");
+
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const componentes = JSON.parse(data);
+    res.json(componentes);
+  } catch (err) {
+    console.error("Erro ao ler componentes.json:", err);
+    res.status(500).json({ error: "Erro ao carregar componentes" });
+  }
+});
+
+app.get("/professor/praticas", (req, res) => {
+  const users = loadUsers();
+  const user = users.find((u) => u.profile === "professor");
+
+  if (!user) {
+    return res.status(404).send("Usuário não encontrado.");
+  }
+
+  res.render("professor/praticas", { user });
+});
+
+
+app.get("/professor/add-componentes", (req, res) => {
+  res.render("professor/add-componentes"); 
+});
+
+
+app.post("/add-componentes-professor", (req, res) => {
+  const { nome, hasId, quantidade, ids, laboratorio, categoria } = req.body;
+
+  const exigeId = hasId === "on"; 
+
+  const novoComponente = {
+    nome,
+    laboratorio,
+    tipo: categoria,
+    descricao: "Sem descrição ainda",
+    exigeId
+  };
+
+  if (exigeId) {
+    const idsArray = ids
+      .split("\n")
+      .map(id => id.trim())
+      .filter(id => id !== "");
+
+    novoComponente.ids = idsArray;
+  } else {
+    novoComponente.quantidade = parseInt(quantidade, 10) || 0;
+  }
+
+  const filePath = path.join(__dirname, "data", "componentes.json");
+  const componentes = JSON.parse(fs.readFileSync(filePath, "utf8"));
+
+  componentes.push(novoComponente);
+
+  fs.writeFileSync(filePath, JSON.stringify(componentes, null, 2), "utf8");
+
+  res.redirect("/professor/componentes");
+});
+
 
 const PORT = 3000;
 app.listen(PORT, () => {

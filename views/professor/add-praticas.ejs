@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Adicionar Componente</title>
+    <%- include('../partials/head') %>
+  </head>
+  <body class="poppins-regular bg-base">
+    <%- include('../partials/navbar') %>
+
+    <main class="container-signup">
+      <h1 class="title">Novo Componente</h1>
+
+      <form action="/add-componentes-professor" method="POST" class="form mt-4">
+        <div class="form-element">
+          <label for="nome">Nome do Componente</label>
+          <input
+            type="text"
+            id="nome"
+            name="nome"
+            required
+            class="input"
+            placeholder="Ex: Arduino Uno"
+          />
+        </div>
+
+        <div class="form-element">
+          <input type="checkbox" id="hasId" name="hasId" />
+          <label for="hasId">Este componente possui ID individual?</label>
+        </div>
+
+        <div class="form-element" id="quantidade-wrapper">
+          <label for="quantidade">Quantidade</label>
+          <input
+            type="number"
+            id="quantidade"
+            name="quantidade"
+            class="input"
+            min="1"
+            placeholder="Ex: 10"
+          />
+        </div>
+
+        <div class="form-element" id="ids-wrapper" style="display: none;">
+          <label for="ids">IDs dos Componentes</label>
+          <textarea
+            id="ids"
+            name="ids"
+            class="input"
+            rows="3"
+            placeholder="Digite um ID por linha"
+          ></textarea>
+        </div>
+
+        <div class="form-element">
+          <label for="laboratorio">Laboratório</label>
+          <input
+            type="text"
+            id="laboratorio"
+            name="laboratorio"
+            required
+            class="input"
+            placeholder="Ex: Lab. de Eletrônica"
+          />
+        </div>
+
+        <div class="form-element">
+          <label for="categoria">Categoria</label>
+          <select id="categoria" name="categoria" class="input">
+            <option value="" disabled selected>Selecione uma categoria</option>
+            <option value="microcontrolador">Microcontrolador</option>
+            <option value="passivo">Componente Passivo</option>
+            <option value="sensor">Sensor</option>
+            <option value="atuador">Atuador</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Cadastrar Componente</button>
+      </form>
+    </main>
+
+    <%- include('../partials/footer') %>
+
+    <script>
+      const checkbox = document.getElementById("hasId");
+      const quantidadeInput = document.getElementById("quantidade");
+      const quantidadeWrapper = document.getElementById("quantidade-wrapper");
+      const idsWrapper = document.getElementById("ids-wrapper");
+
+      function toggleFields() {
+        if (checkbox.checked) {
+          quantidadeInput.disabled = true;
+          quantidadeInput.required = false;
+          quantidadeInput.value = '';
+          quantidadeWrapper.style.display = 'none';
+          idsWrapper.style.display = 'block';
+        } else {
+          quantidadeInput.disabled = false;
+          quantidadeInput.required = true;
+          idsWrapper.style.display = 'none';
+          quantidadeWrapper.style.display = 'block';
+        }
+      }
+
+      checkbox.addEventListener("change", toggleFields);
+      window.addEventListener("DOMContentLoaded", toggleFields);
+    </script>
+  </body>
+</html>

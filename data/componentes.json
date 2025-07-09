@@ -5,7 +5,6 @@
     "descricao": "texto de descricao",
     "laboratorio": "Lab 1",
     "quantidade": "100",
-
     "exigeId": false
   },
   {
@@ -13,9 +12,7 @@
     "tipo": "consumo",
     "descricao": "texto de descricao",
     "laboratorio": "Lab 1",
-
     "quantidade": "100",
-
     "exigeId": false
   },
   {
@@ -23,8 +20,11 @@
     "tipo": "patrimônio",
     "descricao": "texto de descricao",
     "laboratorio": "Lab 1",
-
-    "ids": [1, 2, 3],
+    "ids": [
+      1,
+      2,
+      3
+    ],
     "exigeId": true
   },
   {
@@ -32,9 +32,61 @@
     "tipo": "patrimônio",
     "descricao": "texto de descricao",
     "laboratorio": "Lab 1",
-
-    "ids": [1, 2, 3],
-
+    "ids": [
+      1,
+      2,
+      3
+    ],
     "exigeId": true
+  },
+  {
+    "nome": "sf",
+    "laboratorio": "UFC",
+    "tipo": "microcontrolador",
+    "descricao": "Sem descrição ainda",
+    "exigeId": true,
+    "ids": [
+      "Test"
+    ]
+  },
+  {
+    "nome": "Arduino",
+    "laboratorio": "Lab 2",
+    "tipo": "microcontrolador",
+    "descricao": "Sem descrição ainda",
+    "exigeId": false,
+    "quantidade": 2
+  },
+  {
+    "nome": "dsf",
+    "laboratorio": "fdsa",
+    "tipo": "microcontrolador",
+    "descricao": "Sem descrição ainda",
+    "exigeId": false,
+    "quantidade": 1
+  },
+  {
+    "nome": "dsf",
+    "laboratorio": "fdsa",
+    "tipo": "microcontrolador",
+    "descricao": "Sem descrição ainda",
+    "exigeId": false,
+    "quantidade": 1
+  },
+  {
+    "nome": "dsf",
+    "laboratorio": "fdsa",
+    "tipo": "microcontrolador",
+    "descricao": "Sem descrição ainda",
+    "exigeId": false,
+    "quantidade": 1
+  },
+  {
+    "nome": "dsf",
+    "laboratorio": "fdsa",
+    "tipo": "microcontrolador",
+    "descricao": "Sem descrição ainda",
+    "exigeId": false,
+    "quantidade": 1
   }
 ]
