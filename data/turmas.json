@@ -2,15 +2,38 @@
   {
     "id": 101,
     "nome": "Turma A - Engenharia",
-    "alunosIds": [1],
-    "professoresIds": [3],
-    "praticasIds": [1001, 1002]
+    "alunosIds": [
+      1
+    ],
+    "professoresIds": [
+      3
+    ],
+    "praticasIds": [
+      1001,
+      1002
+    ]
   },
   {
     "id": 102,
     "nome": "Turma B - Computação",
-    "alunosIds": [],
-    "professoresIds": [3],
+    "alunosIds": [
+      1
+    ],
+    "professoresIds": [
+      3
+    ],
+    "praticasIds": []
+  },
+  {
+    "id": 1055,
+    "nome": "Turma C - Computação",
+    "alunosIds": [
+      8,
+      1
+    ],
+    "professoresIds": [
+      3
+    ],
     "praticasIds": []
   }
 ]

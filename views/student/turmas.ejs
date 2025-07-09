@@ -9,16 +9,17 @@
     <%- include('partials/navbar') %>
 
     <main class="container">
-      <h1 class="title">Minhas Práticas</h1>
+      <h1 class="title">Minhas Turmas</h1>
+      <section id="minhas-turmas" class="turmas-grid"></section>
 
-      <section class="student-praticas" id="praticas-container"></section>
+      <h2 class="title mt-4">Outras Turmas Disponíveis</h2>
+      <section id="outras-turmas" class="turmas-grid"></section>
     </main>
-    <script>
-      const userId = <%= user.id %>;
-    </script>
+
     <script src="/js/student.js"></script>
     <script>
-      loadPraticas(userId);
+      const userId = <%= user.id %>;
+      loadTurmas(userId);
     </script>
 
     <%- include('../partials/footer') %>

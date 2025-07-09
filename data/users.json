@@ -6,7 +6,15 @@
     "password": "123",
     "profile": "student",
     "school": "UFC",
-    "turmaId": 101
+    "turmasIds": [
+      101,
+      102,
+      102,
+      1055,
+      1055,
+      1055
+    ],
+    "praticasIds": []
   },
   {
     "id": 2,
@@ -26,7 +34,8 @@
     "turmasIds": [
       101,
       102
-    ]
+    ],
+    "praticasIds": []
   },
   {
     "id": 1752001928849,

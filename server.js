@@ -110,37 +110,130 @@ app.get("/student", (req, res) => {
 });
 
 app.get("/student/praticas", (req, res) => {
-  const user = { name: "Gabriel" };
+  const users = loadUsers();
+  const user = users.find((u) => u.profile === "student");
 
-  const praticas = [
-    {
-      title: "Montagem de LED com resistor",
-      data: "2025-06-26",
-      components: ["LED", "Resistor 220Ω", "Protoboard"],
-      description:
-        "Aprender como ligar um LED com resistor para limitar a corrente.",
-      status: "Planejada",
-      file: "pratica2.pdf",
-    },
-    {
-      title: "Montagem de LED com resistor",
-      data: "2025-06-26",
-      components: ["LED", "Resistor 220Ω", "Protoboard"],
-      description:
-        "Aprender como ligar um LED com resistor para limitar a corrente.",
-      status: "Planejada",
-      file: "pratica1.pdf",
-    },
-  ];
+  if (!user) {
+    return res.status(404).send("Usuário não encontrado.");
+  }
 
-  res.render("student/praticas", { user, praticas });
+  res.render("student/praticas", { user });
+});
+
+app.get("/api/praticas", (req, res) => {
+  const filePath = path.join(__dirname, "data", "praticas.json");
+  const userId = parseInt(req.query.userId);
+
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const allPraticas = JSON.parse(data);
+    if (userId) {
+      const users = loadUsers();
+      const user = users.find(
+        (u) => u.id === userId && u.profile === "student"
+      );
+
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado." });
+      }
+
+      const praticasDoAluno = allPraticas.filter((pratica) =>
+        user.turmasIds.includes(pratica.turmaId)
+      );res.redi
+
+      return res.json(praticasDoAluno);
+    }
+
+    res.json(allPraticas);
+  } catch (err) {
+    console.error("Erro ao ler praticas.json:", err);
+    res.status(500).json({ error: "Erro ao carregar práticas" });
+  }
+});
+
+app.get("/student/turmas", (req, res) => {
+  const users = loadUsers();
+  const user = users.find((u) => u.profile === "student");
+
+  if (!user) {
+    return res.status(404).send("Usuário não encontrado.");
+  }
+
+  res.render("student/turmas", { user });
+});
+
+app.get("/api/turmas", (req, res) => {
+  const filePath = path.join(__dirname, "data", "turmas.json");
+  const userId = parseInt(req.query.userId);
+
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    const allTurmas = JSON.parse(data);
+
+    if (userId) {
+      const users = loadUsers();
+      const user = users.find(
+        (u) => u.id === userId && u.profile === "student"
+      );
+
+      if (!user) {
+        return res.status(404).json({ error: "Usuário não encontrado." });
+      }
+
+      const minhasTurmas = allTurmas.filter((turma) =>
+        turma.alunosIds.includes(user.id)
+      );
+
+      const outrasTurmas = allTurmas.filter(
+        (turma) => !turma.alunosIds.includes(user.id)
+      );
+
+      return res.json({ minhasTurmas, outrasTurmas });
+    }
+
+    res.json(allTurmas);
+  } catch (err) {
+    console.error("Erro ao ler turmas.json:", err);
+    res.status(500).json({ error: "Erro ao carregar turmas" });
+  }
+});
+
+app.post("/student/turmas", (req, res) => {
+  const turmaId = parseInt(req.body.turmaId);
+  const usersPath = path.join(__dirname, "data", "users.json");
+  const turmasPath = path.join(__dirname, "data", "turmas.json");
+
+  const users = JSON.parse(fs.readFileSync(usersPath, "utf8"));
+  const turmas = JSON.parse(fs.readFileSync(turmasPath, "utf8"));
+
+  const user = users.find((u) => u.profile === "student");
+
+  if (!user) {
+    return res.status(404).send("Usuário não encontrado.");
+  }
+
+  const turma = turmas.find((t) => t.id === turmaId);
+
+  if (!turma) {
+    return res.status(404).send("Turma não encontrada.");
+  }
+
+  const jaInscrito = turma.alunosIds.includes(user.id);
+
+  if (!jaInscrito) {
+    turma.alunosIds.push(user.id);
+    user.turmasIds.push(turma.id);
+
+    fs.writeFileSync(usersPath, JSON.stringify(users, null, 2), "utf8");
+    fs.writeFileSync(turmasPath, JSON.stringify(turmas, null, 2), "utf8");
+  }
+
+  res.redirect("/student/turmas");
 });
 
 app.get("/student/componentes", (req, res) => {
-  res.render("student/componentes"); 
+  res.render("student/componentes");
 });
-
-
 
 app.get("/api/componentes", (req, res) => {
   const filePath = path.join(__dirname, "data/componentes.json");
@@ -154,6 +247,7 @@ app.get("/api/componentes", (req, res) => {
     res.status(500).json({ error: "Erro ao carregar componentes" });
   }
 });
+
 
 app.get("/tecnico", (req, res) => {
   const user = { name: "Gabriel" };
