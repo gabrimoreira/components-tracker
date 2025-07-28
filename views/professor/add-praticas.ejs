@@ -1,110 +1,67 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
     <meta charset="UTF-8" />
-    <title>Adicionar Componente</title>
+    <title>Adicionar Nova Prática</title>
     <%- include('../partials/head') %>
-  </head>
-  <body class="poppins-regular bg-base">
+    <style>
+        .componente-item { display: flex; justify-content: space-between; align-items: center; padding: 5px; border-bottom: 1px solid #ddd; }
+        .btn-remover { background: #dc3545; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; }
+    </style>
+</head>
+<body class="poppins-regular bg-base">
     <%- include('../partials/navbar') %>
 
     <main class="container-signup">
-      <h1 class="title">Novo Componente</h1>
+        <h1 class="title">Nova Prática</h1>
 
-      <form action="/add-componentes-professor" method="POST" class="form mt-4">
-        <div class="form-element">
-          <label for="nome">Nome do Componente</label>
-          <input
-            type="text"
-            id="nome"
-            name="nome"
-            required
-            class="input"
-            placeholder="Ex: Arduino Uno"
-          />
-        </div>
+        <form id="add-pratica-form" action="/professor/praticas" method="POST" class="form mt-4">
+            <div class="form-element">
+                <label for="titulo">Título da Prática</label>
+                <input type="text" id="titulo" name="titulo" required class="input" />
+            </div>
 
-        <div class="form-element">
-          <input type="checkbox" id="hasId" name="hasId" />
-          <label for="hasId">Este componente possui ID individual?</label>
-        </div>
+            <div class="form-element">
+                <label for="descricao">Descrição</label>
+                <textarea id="descricao" name="descricao" class="input" rows="3"></textarea>
+            </div>
 
-        <div class="form-element" id="quantidade-wrapper">
-          <label for="quantidade">Quantidade</label>
-          <input
-            type="number"
-            id="quantidade"
-            name="quantidade"
-            class="input"
-            min="1"
-            placeholder="Ex: 10"
-          />
-        </div>
+            <div class="form-element">
+                <label for="turmaId">Associar à Turma</label>
+                <select id="turmaId" name="turmaId" class="input" required>
+                    <option value="" disabled selected>Selecione uma turma</option>
+                    <% turmas.forEach(turma => { %>
+                        <option value="<%= turma.id %>"><%= turma.nome %></option>
+                    <% }) %>
+                </select>
+            </div>
 
-        <div class="form-element" id="ids-wrapper" style="display: none;">
-          <label for="ids">IDs dos Componentes</label>
-          <textarea
-            id="ids"
-            name="ids"
-            class="input"
-            rows="3"
-            placeholder="Digite um ID por linha"
-          ></textarea>
-        </div>
+            <h2 class="title-sm mt-4">Componentes Necessários</h2>
+            <div class="form-element">
+                <label for="componente-select">Adicionar Componente</label>
+                <div >
+                    <select id="componente-select" class="input" >
+                        <option value="">Selecione um componente</option>
+                        <% componentes.forEach(comp => { %>
+                            <option value="<%= comp.nome %>"><%= comp.nome %></option>
+                        <% }) %>
+                    </select>
+                    <button type="button" id="add-componente-btn" class="btn-header">Adicionar</button>
+                </div>
+            </div>
 
-        <div class="form-element">
-          <label for="laboratorio">Laboratório</label>
-          <input
-            type="text"
-            id="laboratorio"
-            name="laboratorio"
-            required
-            class="input"
-            placeholder="Ex: Lab. de Eletrônica"
-          />
-        </div>
+            <div id="lista-componentes-container" class="mt-3"></div>
+            
+            <input type="hidden" name="componentes" id="componentes-hidden-input" />
 
-        <div class="form-element">
-          <label for="categoria">Categoria</label>
-          <select id="categoria" name="categoria" class="input">
-            <option value="" disabled selected>Selecione uma categoria</option>
-            <option value="microcontrolador">Microcontrolador</option>
-            <option value="passivo">Componente Passivo</option>
-            <option value="sensor">Sensor</option>
-            <option value="atuador">Atuador</option>
-            <option value="outro">Outro</option>
-          </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary mt-3">Cadastrar Componente</button>
-      </form>
+            <button type="submit" class="btn btn-primary mt-3">Cadastrar Prática</button>
+        </form>
     </main>
 
     <%- include('../partials/footer') %>
-
+    <script src="/js/professor.js"></script>
     <script>
-      const checkbox = document.getElementById("hasId");
-      const quantidadeInput = document.getElementById("quantidade");
-      const quantidadeWrapper = document.getElementById("quantidade-wrapper");
-      const idsWrapper = document.getElementById("ids-wrapper");
-
-      function toggleFields() {
-        if (checkbox.checked) {
-          quantidadeInput.disabled = true;
-          quantidadeInput.required = false;
-          quantidadeInput.value = '';
-          quantidadeWrapper.style.display = 'none';
-          idsWrapper.style.display = 'block';
-        } else {
-          quantidadeInput.disabled = false;
-          quantidadeInput.required = true;
-          idsWrapper.style.display = 'none';
-          quantidadeWrapper.style.display = 'block';
-        }
-      }
-
-      checkbox.addEventListener("change", toggleFields);
-      window.addEventListener("DOMContentLoaded", toggleFields);
+        document.addEventListener('DOMContentLoaded', initializeAddPraticasForm);
     </script>
-  </body>
+</body>
 </html>

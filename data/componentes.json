@@ -40,53 +40,54 @@
     "exigeId": true
   },
   {
-    "nome": "sf",
-    "laboratorio": "UFC",
-    "tipo": "microcontrolador",
-    "descricao": "Sem descrição ainda",
+    "nome": "HC-06",
+    "tipo": "atuador",
+    "descricao": "Módulo bluetooth",
+    "laboratorio": "Laboratório de Quântica",
+    "exigeId": false,
+    "quantidade": 20,
+    "ids": []
+  },
+  {
+    "nome": "HC-06",
+    "tipo": "atuador",
+    "descricao": "Módulo bluetooth",
+    "laboratorio": "Laboratório de Quântica",
     "exigeId": true,
+    "quantidade": 0,
     "ids": [
-      "Test"
+      "ID-90",
+      "ID-101"
     ]
   },
   {
-    "nome": "Arduino",
-    "laboratorio": "Lab 2",
+    "nome": "teste",
     "tipo": "microcontrolador",
-    "descricao": "Sem descrição ainda",
+    "descricao": "Teste",
+    "laboratorio": "teste",
     "exigeId": false,
-    "quantidade": 2
+    "quantidade": 4,
+    "ids": []
   },
   {
-    "nome": "dsf",
-    "laboratorio": "fdsa",
+    "nome": "Componente X",
     "tipo": "microcontrolador",
-    "descricao": "Sem descrição ainda",
-    "exigeId": false,
-    "quantidade": 1
+    "descricao": "Placa de desenvolvimento",
+    "laboratorio": "Lab de elétrica",
+    "exigeId": true,
+    "quantidade": 0,
+    "ids": [
+      "ID-1",
+      "ID-2"
+    ]
   },
   {
-    "nome": "dsf",
-    "laboratorio": "fdsa",
-    "tipo": "microcontrolador",
-    "descricao": "Sem descrição ainda",
+    "nome": "HC-03",
+    "tipo": "passivo",
+    "descricao": "Módulo de eletrônica",
+    "laboratorio": "Lab 4",
     "exigeId": false,
-    "quantidade": 1
-  },
-  {
-    "nome": "dsf",
-    "laboratorio": "fdsa",
-    "tipo": "microcontrolador",
-    "descricao": "Sem descrição ainda",
-    "exigeId": false,
-    "quantidade": 1
-  },
-  {
-    "nome": "dsf",
-    "laboratorio": "fdsa",
-    "tipo": "microcontrolador",
-    "descricao": "Sem descrição ainda",
-    "exigeId": false,
-    "quantidade": 1
+    "quantidade": 20,
+    "ids": []
   }
 ]

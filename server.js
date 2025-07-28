@@ -1,393 +1,442 @@
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const {
-  readComponentes,
-  saveComponentes,
-  loadUsers,
-  saveUsers,
-} = require("./utils/jsonUtils");
-const componentesBase = require("./data/componentesBase");
-const fs = require("fs");
-
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const app = express();
-app.use(express.urlencoded({ extended: true }));
 
-app.post("/sign-up", (req, res) => {
-  const users = loadUsers();
-  const { name, accountType, school, email, password, confirmPassword } =
-    req.body;
-
-  if (password !== confirmPassword) {
-    return res.status(400).send("As senhas não coincidem.");
-  }
-
-  let profile;
-  switch (accountType) {
-    case "basic":
-      profile = "student";
-      break;
-    case "premium":
-      profile = "tecnico";
-      break;
-    case "admin":
-      profile = "professor";
-      break;
-    default:
-      return res.status(400).send("Tipo de conta inválido.");
-  }
-
-  const newUser = {
-    id: Date.now(),
-    name,
-    email,
-    password,
-    profile,
-    school,
-  };
-
-  if (profile === "student" || profile === "professor") {
-    newUser.turmasIds = [];
-    newUser.praticasIds = [];
-  }
-
-  users.push(newUser);
-  saveUsers(users);
-
-  if (profile === "student") {
-    res.render("student/index", { user: newUser });
-  } else if (profile === "professor") {
-    res.render("professor/index", { user: newUser });
-  } else {
-    res.render("tecnico/index", { user: newUser });
-  }
-});
+const API_URL = process.env.API_URL;
+const JWT_SECRET = process.env.JWT_SECRET;
+const PORT = process.env.PORT_SERVER || 3000;
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
-let userTest = null;
 app.use(express.static(path.join(__dirname, "public")));
-const componentes = [];
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.render("index");
-});
-app.get("/login", (req, res) => {
-  res.render("login");
-});
-app.post("/login", (req, res) => {
+function authenticateServer(req, res, next) {
+  const token = req.cookies.token;
+  if (!token) return res.redirect("/login");
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      res.clearCookie("token");
+      return res.redirect("/login");
+    }
+    req.user = user;
+    next();
+  });
+}
+
+// Páginas públicas
+app.get("/", (req, res) => res.render("index"));
+app.get("/login", (req, res) => res.render("login"));
+app.get("/sign-up", (req, res) => res.render("sign-up"));
+
+// Autenticação
+app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const users = loadUsers();
+  const response = await fetch(`${API_URL}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  if (!response.ok) return res.status(401).send("Credenciais inválidas");
+  const user = await response.json();
+  const token = jwt.sign(user, JWT_SECRET, { expiresIn: "2h" });
+  res.cookie("token", token, { httpOnly: true });
+  res.redirect(`/${user.profile}`);
+});
 
-  const user = users.find((u) => u.email === email && u.password === password);
+app.post("/sign-up", async (req, res) => {
+  try {
+    const { password, confirmPassword } = req.body;
 
-  if (!user) {
-    return res.status(401).send("Usuário não encontrado.");
+    if (password !== confirmPassword) {
+      return res.status(400).send("As senhas não coincidem.");
+    }
+
+    const response = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(req.body),
+    });
+
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      return res.status(response.status).send(`Erro ao registrar: ${errorMsg}`);
+    }
+
+ 
+    res.redirect("/login?status=success");
+
+  } catch (error) {
+    console.error('ERRO NO SIGN-UP (SERVER):', error);
+    res.status(500).send('Não foi possível se conectar ao serviço de autenticação.');
   }
-  userTest = user;
-
-  const profile = user.profile;
-  if (profile === "student") return res.redirect("/student");
-  if (profile === "tecnico") return res.redirect("/tecnico");
-  if (profile === "professor") return res.redirect("/professor");
-
-  res.redirect("/");
+});
+app.get("/logout", (req, res) => {
+  res.clearCookie("token");
+  res.redirect("/login");
 });
 
-app.get("/sign-up", (req, res) => {
-  res.render("sign-up");
+// Perfis
+app.get("/student", authenticateServer, (req, res) => {
+  if (req.user.profile !== "student")
+    return res.status(403).send("Acesso negado.");
+  res.render("student/index", { user: req.user });
 });
-app.get("/professor", (req, res) => {
-  if (!userTest || userTest.profile !== "professor") {
+
+app.get("/professor", authenticateServer, (req, res) => {
+  if (req.user.profile !== "professor")
+    return res.status(403).send("Acesso negado.");
+  res.render("professor/index", { user: req.user });
+});
+
+app.get("/tecnico", authenticateServer, (req, res) => {
+  if (req.user.profile !== "tecnico")
+    return res.status(403).send("Acesso negado.");
+  res.render("tecnico/index", { user: req.user });
+});
+
+// Componentes
+app.get("/student/componentes/json", authenticateServer, async (req, res) => {
+  const response = await fetch(`${API_URL}/componentes`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+
+  if (!response.ok) {
+    const msg = await response.text();
+    return res.status(500).send(`Erro ao carregar componentes: ${msg}`);
+  }
+
+  const componentes = await response.json();
+  res.json(componentes);
+});
+
+app.get("/:profile/componentes", authenticateServer, async (req, res) => {
+  const response = await fetch(`${API_URL}/componentes`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+
+  if (!response.ok) {
+    const msg = await response.text();
+    return res.status(500).send(`Erro ao carregar os componentes: ${msg}`);
+  }
+
+  const componentes = await response.json();
+  res.render(`${req.user.profile}/componentes`, {
+    user: req.user,
+    componentes,
+  });
+});
+
+app.get("/:profile/add-componentes", authenticateServer, (req, res) => {
+  res.render(`${req.user.profile}/add-componentes`, { user: req.user });
+});
+
+app.post("/add-componentes", authenticateServer, async (req, res) => {
+  await fetch(`${API_URL}/componentes`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${req.cookies.token}`,
+    },
+    body: JSON.stringify(req.body),
+  });
+  res.redirect(`/${req.user.profile}/componentes`);
+});
+
+app.get("/tecnico/componentes/json", authenticateServer, async (req, res) => {
+  if (req.user.profile !== "tecnico") {
     return res.status(403).send("Acesso negado.");
   }
 
-  res.render("professor/index", { user: userTest });
+  const response = await fetch(`${API_URL}/componentes`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+
+  if (!response.ok) {
+    return res.status(500).send(`Erro ao carregar componentes da API.`);
+  }
+
+  const componentes = await response.json();
+  res.json(componentes);
 });
 
-app.get("/student", (req, res) => {
-  if (!userTest || userTest.profile !== "student") {
+app.get("/professor/componentes/json", authenticateServer, async (req, res) => {
+  if (req.user.profile !== "professor")
     return res.status(403).send("Acesso negado.");
-  }
-
-  res.render("student/index", { user: userTest });
+  const response = await fetch(`${API_URL}/componentes`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+  const data = await response.json();
+  res.json(data);
+});
+app.get("/professor/add-componentes", authenticateServer, (req, res) => {
+  res.render("professor/add-componentes", { user: req.user });
 });
 
-app.get("/student/praticas", (req, res) => {
-  const users = loadUsers();
-  const user = users.find((u) => u.profile === "student");
-
-  if (!user) {
-    return res.status(404).send("Usuário não encontrado.");
-  }
-
-  res.render("student/praticas", { user });
-});
-
-app.get("/api/praticas", (req, res) => {
-  const filePath = path.join(__dirname, "data", "praticas.json");
-  const userId = parseInt(req.query.userId);
-
+// Turmas
+app.get('/student/turmas/json', authenticateServer, async (req, res) => {
   try {
-    const data = fs.readFileSync(filePath, "utf8");
-    const allPraticas = JSON.parse(data);
-    if (userId) {
-      const users = loadUsers();
-      const user = users.find(
-        (u) => u.id === userId && u.profile === "student"
-      );
+    const response = await fetch(`${API_URL}/turmas`, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` }
+    });
 
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado." });
-      }
-
-      const praticasDoAluno = allPraticas.filter((pratica) =>
-        user.turmasIds.includes(pratica.turmaId)
-      );res.redi
-
-      return res.json(praticasDoAluno);
+    if (!response.ok) {
+      const errorMsg = await response.text();
+      console.error(`Erro da API ao buscar turmas: ${errorMsg}`);
+      return res.status(response.status).json({ error: errorMsg });
     }
 
-    res.json(allPraticas);
-  } catch (err) {
-    console.error("Erro ao ler praticas.json:", err);
-    res.status(500).json({ error: "Erro ao carregar práticas" });
+    const turmas = await response.json();
+    res.json(turmas);
+    
+  } catch (error) {
+    console.error("ERRO DE CONEXÃO COM A API:", error);
+    res.status(500).json({ error: "Não foi possível conectar ao serviço de turmas." });
   }
 });
 
-app.get("/student/turmas", (req, res) => {
-  const users = loadUsers();
-  const user = users.find((u) => u.profile === "student");
-
-  if (!user) {
-    return res.status(404).send("Usuário não encontrado.");
-  }
-
-  res.render("student/turmas", { user });
+app.get("/student/turmas", authenticateServer, async (req, res) => {
+  const response = await fetch(`${API_URL}/turmas`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+  const data = await response.json();
+  res.render("student/turmas", { user: req.user, ...data });
 });
 
-app.get("/api/turmas", (req, res) => {
-  const filePath = path.join(__dirname, "data", "turmas.json");
-  const userId = parseInt(req.query.userId);
-
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    const allTurmas = JSON.parse(data);
-
-    if (userId) {
-      const users = loadUsers();
-      const user = users.find(
-        (u) => u.id === userId && u.profile === "student"
-      );
-
-      if (!user) {
-        return res.status(404).json({ error: "Usuário não encontrado." });
-      }
-
-      const minhasTurmas = allTurmas.filter((turma) =>
-        turma.alunosIds.includes(user.id)
-      );
-
-      const outrasTurmas = allTurmas.filter(
-        (turma) => !turma.alunosIds.includes(user.id)
-      );
-
-      return res.json({ minhasTurmas, outrasTurmas });
-    }
-
-    res.json(allTurmas);
-  } catch (err) {
-    console.error("Erro ao ler turmas.json:", err);
-    res.status(500).json({ error: "Erro ao carregar turmas" });
-  }
-});
-
-app.post("/student/turmas", (req, res) => {
-  const turmaId = parseInt(req.body.turmaId);
-  const usersPath = path.join(__dirname, "data", "users.json");
-  const turmasPath = path.join(__dirname, "data", "turmas.json");
-
-  const users = JSON.parse(fs.readFileSync(usersPath, "utf8"));
-  const turmas = JSON.parse(fs.readFileSync(turmasPath, "utf8"));
-
-  const user = users.find((u) => u.profile === "student");
-
-  if (!user) {
-    return res.status(404).send("Usuário não encontrado.");
-  }
-
-  const turma = turmas.find((t) => t.id === turmaId);
-
-  if (!turma) {
-    return res.status(404).send("Turma não encontrada.");
-  }
-
-  const jaInscrito = turma.alunosIds.includes(user.id);
-
-  if (!jaInscrito) {
-    turma.alunosIds.push(user.id);
-    user.turmasIds.push(turma.id);
-
-    fs.writeFileSync(usersPath, JSON.stringify(users, null, 2), "utf8");
-    fs.writeFileSync(turmasPath, JSON.stringify(turmas, null, 2), "utf8");
-  }
-
+app.post("/student/turmas", authenticateServer, async (req, res) => {
+  await fetch(`${API_URL}/turmas/inscrever`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${req.cookies.token}`,
+    },
+    body: JSON.stringify({ turmaId: req.body.turmaId }),
+  });
   res.redirect("/student/turmas");
 });
 
-app.get("/student/componentes", (req, res) => {
-  res.render("student/componentes");
+app.get('/professor/turmas/json', authenticateServer, async (req, res) => {
+    if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+    const response = await fetch(`${API_URL}/turmas/professor/${req.user.id}`, { headers: { Authorization: `Bearer ${req.cookies.token}` } });
+    const data = await response.json();
+    res.json(data);
 });
 
-app.get("/api/componentes", (req, res) => {
-  const filePath = path.join(__dirname, "data/componentes.json");
-
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    const componentes = JSON.parse(data);
-    res.json(componentes);
-  } catch (err) {
-    console.error("Erro ao ler componentes.json:", err);
-    res.status(500).json({ error: "Erro ao carregar componentes" });
-  }
+app.get('/professor/turmas', authenticateServer, async (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+  
+  const response = await fetch(`${API_URL}/turmas/professor/${req.user.id}`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` }
+  });
+  const turmas = await response.json();
+  res.render('professor/turmas', { user: req.user, turmas });
 });
 
+app.get('/professor/turmas/add', authenticateServer, (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+  res.render('professor/add-turma', { user: req.user });
+});
 
-app.get("/tecnico", (req, res) => {
-  if (!userTest || userTest.profile !== "tecnico") {
+app.post('/professor/turmas', authenticateServer, async (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+  
+  await fetch(`${API_URL}/turmas`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${req.cookies.token}` },
+    body: JSON.stringify(req.body)
+  });
+  res.redirect('/professor/turmas');
+});
+
+app.get('/professor/turmas/:id/edit', authenticateServer, async (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+  
+  const response = await fetch(`${API_URL}/turmas/${req.params.id}`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` }
+  });
+  if (!response.ok) return res.status(404).send('Turma não encontrada.');
+  
+  const turma = await response.json();
+  res.render('professor/edit-turma', { user: req.user, turma });
+});
+
+app.post('/professor/turmas/:id/edit', authenticateServer, async (req, res) => {
+    if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+
+
+    let alunosIds = req.body.alunosIds || [];
+    if (!Array.isArray(alunosIds)) {
+        alunosIds = [alunosIds];
+    }
+    alunosIds = alunosIds.map(id => parseInt(id));
+
+    const payload = {
+        nome: req.body.nome,
+        alunosIds: alunosIds
+    };
+
+    await fetch(`${API_URL}/turmas/${req.params.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${req.cookies.token}` },
+        body: JSON.stringify(payload)
+    });
+    res.redirect('/professor/turmas');
+});
+
+app.delete('/professor/turmas/:id', authenticateServer, async (req, res) => {
+    if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+    const response = await fetch(`${API_URL}/turmas/${req.params.id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${req.cookies.token}` }
+    });
+    res.sendStatus(response.status);
+});
+// Práticas
+app.get("/student/praticas/json", authenticateServer, async (req, res) => {
+  const response = await fetch(`${API_URL}/praticas`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+  const praticas = await response.json();
+  res.json(praticas);
+});
+
+app.get("/student/praticas", authenticateServer, async (req, res) => {
+  const response = await fetch(`${API_URL}/praticas`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+  const praticas = await response.json();
+  res.render("student/praticas", { user: req.user, praticas });
+});
+
+app.get("/professor/praticas", authenticateServer, (req, res) => {
+  res.render("professor/praticas", { user: req.user });
+});
+
+app.get("/tecnico/praticas", authenticateServer, async (req, res) => {
+  if (req.user.profile !== "tecnico") {
     return res.status(403).send("Acesso negado.");
   }
 
-  res.render("tecnico/index", { user: userTest });
-});
+  const response = await fetch(`${API_URL}/praticas`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
 
-app.get("/tecnico/componentes", (req, res) => {
-  res.render("tecnico/componentes");
-});
-
-app.get("/api/componentes", (req, res) => {
-  const filePath = path.join(__dirname, "data/componentes.json");
-
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    const componentes = JSON.parse(data);
-    res.json(componentes);
-  } catch (err) {
-    console.error("Erro ao ler componentes.json:", err);
-    res.status(500).json({ error: "Erro ao carregar componentes" });
-  }
-});
-
-app.get("/tecnico/add-componentes", (req, res) => {
-  res.render("tecnico/add-componentes"); 
-});
-
-
-app.post("/add-componentes", (req, res) => {
-  const { nome, hasId, quantidade, ids, laboratorio, categoria } = req.body;
-
-  const exigeId = hasId === "on"; 
-
-  const novoComponente = {
-    nome,
-    laboratorio,
-    tipo: categoria,
-    descricao: "Sem descrição ainda",
-    exigeId
-  };
-
-  if (exigeId) {
-    const idsArray = ids
-      .split("\n")
-      .map(id => id.trim())
-      .filter(id => id !== "");
-
-    novoComponente.ids = idsArray;
-  } else {
-    novoComponente.quantidade = parseInt(quantidade, 10) || 0;
+  if (!response.ok) {
+    return res.status(500).send("Erro ao carregar práticas da API.");
   }
 
-  const filePath = path.join(__dirname, "data", "componentes.json");
-  const componentes = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-  componentes.push(novoComponente);
-
-  fs.writeFileSync(filePath, JSON.stringify(componentes, null, 2), "utf8");
-
-  res.redirect("/tecnico/componentes");
+  const praticas = await response.json();
+  res.render("tecnico/praticas", { user: req.user, praticas });
 });
 
+app.get("/professor/add-praticas", authenticateServer, async (req, res) => {
+  if (req.user.profile !== "professor")
+    return res.status(403).send("Acesso negado.");
 
+  const [turmasRes, componentesRes] = await Promise.all([
+    fetch(`${API_URL}/turmas/professor/${req.user.id}`, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` },
+    }),
+    fetch(`${API_URL}/componentes`, {
+      headers: { Authorization: `Bearer ${req.cookies.token}` },
+    }),
+  ]);
 
-app.get("/professor/componentes", (req, res) => {
-  res.render("professor/componentes");
+  const turmas = await turmasRes.json();
+  const componentes = await componentesRes.json();
+
+  res.render("professor/add-praticas", { user: req.user, turmas, componentes });
 });
 
-app.get("/api/componentes", (req, res) => {
-  const filePath = path.join(__dirname, "data/componentes.json");
+app.post("/professor/praticas", authenticateServer, async (req, res) => {
+  if (req.user.profile !== "professor")
+    return res.status(403).send("Acesso negado.");
 
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    const componentes = JSON.parse(data);
-    res.json(componentes);
-  } catch (err) {
-    console.error("Erro ao ler componentes.json:", err);
-    res.status(500).json({ error: "Erro ao carregar componentes" });
-  }
-});
+  const response = await fetch(`${API_URL}/praticas`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${req.cookies.token}`,
+    },
+    body: JSON.stringify(req.body),
+  });
 
-app.get("/professor/praticas", (req, res) => {
-  const users = loadUsers();
-  const user = users.find((u) => u.profile === "professor");
-
-  if (!user) {
-    return res.status(404).send("Usuário não encontrado.");
-  }
-
-  res.render("professor/praticas", { user });
-});
-
-
-app.get("/professor/add-componentes", (req, res) => {
-  res.render("professor/add-componentes"); 
-});
-
-
-app.post("/add-componentes-professor", (req, res) => {
-  const { nome, hasId, quantidade, ids, laboratorio, categoria } = req.body;
-
-  const exigeId = hasId === "on"; 
-
-  const novoComponente = {
-    nome,
-    laboratorio,
-    tipo: categoria,
-    descricao: "Sem descrição ainda",
-    exigeId
-  };
-
-  if (exigeId) {
-    const idsArray = ids
-      .split("\n")
-      .map(id => id.trim())
-      .filter(id => id !== "");
-
-    novoComponente.ids = idsArray;
-  } else {
-    novoComponente.quantidade = parseInt(quantidade, 10) || 0;
+  if (!response.ok) {
+    const errorMsg = await response.text();
+    return res
+      .status(response.status)
+      .send(`Erro ao criar prática: ${errorMsg}`);
   }
 
-  const filePath = path.join(__dirname, "data", "componentes.json");
-  const componentes = JSON.parse(fs.readFileSync(filePath, "utf8"));
-
-  componentes.push(novoComponente);
-
-  fs.writeFileSync(filePath, JSON.stringify(componentes, null, 2), "utf8");
-
-  res.redirect("/professor/componentes");
+  res.redirect("/professor/praticas");
 });
 
+app.get("/professor/praticas/json", authenticateServer, async (req, res) => {
+  if (req.user.profile !== "professor")
+    return res.status(403).send("Acesso negado.");
+  const response = await fetch(`${API_URL}/praticas`, {
+    headers: { Authorization: `Bearer ${req.cookies.token}` },
+  });
+  const data = await response.json();
+  res.json(data);
+});
+app.get("/professor/praticas", authenticateServer, (req, res) => {
+  res.render("professor/praticas", { user: req.user });
+});
 
-const PORT = 3000;
+app.get('/professor/praticas/:id/edit', authenticateServer, async (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+  
+  const praticaId = req.params.id;
+  const headers = { Authorization: `Bearer ${req.cookies.token}` };
+
+  const [praticaRes, turmasRes, componentesRes] = await Promise.all([
+      fetch(`${API_URL}/praticas/${praticaId}`, { headers }),
+      fetch(`${API_URL}/turmas/professor/${req.user.id}`, { headers }),
+      fetch(`${API_URL}/componentes`, { headers })
+  ]);
+
+  if (!praticaRes.ok) return res.status(404).send("Prática não encontrada.");
+
+  const pratica = await praticaRes.json();
+  const turmas = await turmasRes.json();
+  const componentes = await componentesRes.json();
+
+  res.render('professor/edit-pratica', { user: req.user, pratica, turmas, componentes });
+});
+
+app.delete('/professor/praticas/:id', authenticateServer, async (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+  
+  const response = await fetch(`${API_URL}/praticas/${req.params.id}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${req.cookies.token}` }
+  });
+
+  res.sendStatus(response.status);
+});
+
+app.put('/professor/praticas/:id', authenticateServer, async (req, res) => {
+  if (req.user.profile !== 'professor') return res.status(403).send("Acesso negado.");
+
+  const response = await fetch(`${API_URL}/praticas/${req.params.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${req.cookies.token}` },
+    body: JSON.stringify(req.body)
+  });
+
+  if (!response.ok) {
+    return res.status(response.status).send(await response.text());
+  }
+  
+  const data = await response.json();
+  res.status(200).json(data);
+});
 app.listen(PORT, () => {
-  console.log(`Rodando na Porta: http://localhost:${PORT}`);
+  console.log(`Server.js ouvindo na porta ${PORT}`);
 });

@@ -1,48 +1,33 @@
 [
   {
-    "id": 1,
-    "name": "Alice",
-    "email": "alice@aluno.com",
-    "password": "123",
+    "id": 1753717353910,
+    "name": "Gabriel",
+    "email": "gabriel@email.com",
+    "password": "$2b$10$SI9XHHnTn32.LjjV6ejPLu1UYTcVXEZ6k0QJ91EqWhEp9rl6diwDm",
     "profile": "student",
     "school": "UFC",
     "turmasIds": [
-      101,
-      102,
-      102,
-      1055,
-      1055,
-      1055
+      1753717494286,
+      1753730716843
     ],
     "praticasIds": []
   },
   {
-    "id": 2,
-    "name": "Bruno",
-    "email": "bruno@tecnico.com",
-    "password": "123",
-    "profile": "tecnico",
-    "school": "UFC"
-  },
-  {
-    "id": 3,
-    "name": "Clara",
-    "email": "clara@professor.com",
-    "password": "123",
+    "id": 1753717450855,
+    "name": "Gabriel",
+    "email": "gabriel@professor.com",
+    "password": "$2b$10$D5eedp0PSGr9TYM.DGrSxuDz19JlWtw/iRMYeedXxcQyhfIBGRbKO",
     "profile": "professor",
     "school": "UFC",
-    "turmasIds": [
-      101,
-      102
-    ],
+    "turmasIds": [],
     "praticasIds": []
   },
   {
-    "id": 1752001928849,
-    "name": "sdf",
-    "email": "gabriel@email.com",
-    "password": "123",
-    "profile": "student",
+    "id": 1753718201980,
+    "name": "Gabriel",
+    "email": "gabriel@tecnico.com",
+    "password": "$2b$10$GITaa6g/6HfwmZJWVezOJ.XXy.uR4sRB3pqM6nakCmhYQhse2HDHK",
+    "profile": "tecnico",
     "school": "UFC",
     "turmasIds": [],
     "praticasIds": []

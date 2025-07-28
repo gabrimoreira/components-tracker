@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" /><title>Editar Turma</title><%- include('../partials/head') %>
+</head>
+<body class="poppins-regular bg-base">
+    <%- include('../partials/navbar') %>
+    <main class="container-signup">
+        <h1 class="title">Editar Turma</h1>
+        <form action="/professor/turmas/<%= turma.id %>/edit" method="POST" class="form mt-4">
+            <div class="form-element">
+                <label for="nome">Nome da Turma</label>
+                <input type="text" id="nome" name="nome" required class="input" value="<%= turma.nome %>">
+            </div>
+            <h2 class="title-sm mt-4">Alunos Inscritos</h2>
+            <div class="form-element">
+                <% if (turma.alunos.length > 0) { %>
+                    <% turma.alunos.forEach(aluno => { %>
+                        <div class="aluno-item">
+                            <input type="checkbox" name="alunosIds" value="<%= aluno.id %>" id="aluno-<%= aluno.id %>" checked>
+                            <label for="aluno-<%= aluno.id %>"><%= aluno.name %> (<%= aluno.email %>)</label>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <p>Nenhum aluno inscrito nesta turma.</p>
+                <% } %>
+            </div>
+            <p class="text-sm">Para remover um aluno, desmarque a caixa de seleção correspondente.</p>
+            <button type="submit" class="btn btn-primary mt-3">Salvar Alterações</button>
+        </form>
+    </main>
+    <%- include('../partials/footer') %>
+</body>
+</html>

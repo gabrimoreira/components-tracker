@@ -13,12 +13,9 @@
 
       <section class="student-praticas" id="praticas-container"></section>
     </main>
-    <script>
-      const userId = <%= user.id %>;
-    </script>
     <script src="/js/student.js"></script>
     <script>
-      loadPraticas(userId);
+      document.addEventListener("DOMContentLoaded", loadPraticas);
     </script>
 
     <%- include('../partials/footer') %>

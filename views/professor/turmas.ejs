@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <title>Minhas Turmas</title>
+    <%- include('../partials/head') %>
+</head>
+<body class="poppins-regular bg-base">
+    <%- include('../partials/navbar') %>
+    <main class="container">
+        <div class="header-com-botao">
+            <h1 class="title">Gerenciar Minhas Turmas</h1>
+            <a href="/professor/turmas/add" class="btn btn-primary">Criar Nova Turma</a>
+        </div>
+
+        <section id="turmas-container" class="turmas-grid">
+            <% if (turmas.length > 0) { %>
+                <% turmas.forEach(turma => { %>
+                    <div class="turma-card" data-turma-id="<%= turma.id %>">
+                        <h2><%= turma.nome %></h2>
+                        <p>Alunos inscritos: <%= turma.alunosIds.length %></p>
+                        <div class="card-actions">
+                            <a href="/professor/turmas/<%= turma.id %>/edit" class="btn-editar">Gerenciar</a>
+                            <button class="btn-excluir" data-id="<%= turma.id %>">Excluir</button>
+                        </div>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p>Você ainda não criou nenhuma turma.</p>
+            <% } %>
+        </section>
+    </main>
+    <%- include('../partials/footer') %>
+    <script src="/js/professor.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', initializeTurmasPage);
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" /><title>Criar Nova Turma</title><%- include('../partials/head') %>
+</head>
+<body class="poppins-regular bg-base">
+    <%- include('../partials/navbar') %>
+    <main class="container-signup">
+        <h1 class="title">Criar Nova Turma</h1>
+        <form action="/professor/turmas" method="POST" class="form mt-4">
+            <div class="form-element">
+                <label for="nome">Nome da Turma</label>
+                <input type="text" id="nome" name="nome" required class="input" placeholder="Ex: Tópicos Especiais em Computação">
+            </div>
+            <button type="submit" class="btn btn-primary mt-3">Salvar Turma</button>
+        </form>
+    </main>
+    <%- include('../partials/footer') %>
+</body>
+</html>

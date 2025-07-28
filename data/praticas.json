@@ -1,23 +1,30 @@
 [
   {
-    "id": 1001,
-    "titulo": "Circuitos Elétricos",
-    "descricao": "Aprender sobre resistores e capacitores.",
-    "turmaId": 101,
+    "id": 1753718140826,
+    "titulo": "Pratica 2",
+    "descricao": "Explicação da Pratica 2",
+    "turmaId": 1753717494286,
     "componentes": [
-      { "nome": "Resistor 220Ω", "quantidade": 10 },
-      { "nome": "Protoboard", "ids": ["PB001", "PB002"] }
+      {
+        "nome": "LED",
+        "quantidade": 10
+      },
+      {
+        "nome": "HC-06",
+        "quantidade": 10
+      }
     ]
   },
-    {
-    "id": 1001,
-    "titulo": "Circuitos Elétricos",
-    "descricao": "Aprender sobre resistores e capacitores.",
-    "turmaId": 101,
+  {
+    "id": 1753730807801,
+    "titulo": "Pratica da turma 2",
+    "descricao": "Descrição da pratica",
+    "turmaId": 1753730716843,
     "componentes": [
-      { "nome": "Resistor 220Ω", "quantidade": 10 },
-      { "nome": "Protoboard", "ids": ["PB001", "PB002"] }
+      {
+        "nome": "HC-06",
+        "quantidade": 10
+      }
     ]
   }
 ]
-

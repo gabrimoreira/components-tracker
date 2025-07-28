@@ -17,9 +17,9 @@
     </main>
 
     <script src="/js/student.js"></script>
+
     <script>
-      const userId = <%= user.id %>;
-      loadTurmas(userId);
+      document.addEventListener("DOMContentLoaded", loadTurmas);
     </script>
 
     <%- include('../partials/footer') %>

@@ -2,32 +2,45 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <title>Home</title>
+    <title>Todas as Práticas</title>
     <%- include('partials/head') %>
   </head>
   <body class="poppins-regular bg-base">
     <%- include('partials/navbar') %>
 
     <main class="container">
-      <h1 class="title">Minhas Práticas</h1>
+      <h1 class="title">Todas as Práticas Cadastradas</h1>
 
       <section class="student-praticas">
-        <% praticas.forEach(pratica => { %>
-        <div class="student-card">
-          <h2><%= pratica.title %></h2>
-          <p><strong>Data:</strong> <%= pratica.data %></p>
-          <p><strong>Status:</strong> <%= pratica.status %></p>
-          <p><strong>Descrição:</strong> <%= pratica.description %></p>
-          <p><strong>Arquivo:</strong> <%= pratica.file %></p>
-
-          <p><strong>Componentes:</strong></p>
-          <ul>
-            <% pratica.components.forEach(comp => { %>
-            <li><%= comp %></li>
-            <% }) %>
-          </ul>
-        </div>
-        <% }) %>
+        <% if (praticas && praticas.length > 0) { %>
+          <% praticas.forEach(pratica => { %>
+            <div class="student-card">
+              <h2><%= pratica.titulo %></h2>
+              <p><strong>Turma ID:</strong> <%= pratica.turmaId %></p>
+              <p><strong>Descrição:</strong> <%= pratica.descricao %></p>
+              
+              <% if (pratica.componentes && pratica.componentes.length > 0) { %>
+                <p><strong>Componentes:</strong></p>
+                <ul>
+                  <% pratica.componentes.forEach(comp => { %>
+                    <li>
+                      <%= comp.nome %> 
+                      <% if (comp.ids) { %>
+                        (IDs: <%= comp.ids.join(', ') %>)
+                      <% } else if (comp.quantidade) { %>
+                        (Qtd: <%= comp.quantidade %>)
+                      <% } %>
+                    </li>
+                  <% }) %>
+                </ul>
+              <% } else { %>
+                <p><strong>Componentes:</strong> Nenhum componente associado.</p>
+              <% } %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <p>Nenhuma prática encontrada.</p>
+        <% } %>
       </section>
     </main>
 
